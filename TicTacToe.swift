@@ -1,6 +1,12 @@
 #!/usr/bin/swift
 
-import Foundation
+// The above line refers to the path where swift is installed on your system.
+
+// Install Swift: https://swift.org/download/
+
+// If you are not able to run the file because of permission issue, please run the below command (make sure that .swift is included in the file-path)
+// chmod +x <path-to-this-file>
+
 
 var validInput = false
 var player1PreviousMoves = 0
@@ -11,10 +17,10 @@ var currentIsPlayer1 = false
 var currentIsPlayer2 = false
 var player1Choice = ""
 var player2Choice = ""
-var gameRefreshed = false
+var gameDraw = false
 
 
-var dict = ["1": (row: 0, column: 0),
+var boardIndices = ["1": (row: 0, column: 0),
             "2": (row: 0, column: 1),
             "3": (row: 0, column: 2),
             "4": (row: 1, column: 0),
@@ -26,18 +32,18 @@ var dict = ["1": (row: 0, column: 0),
 
 
 func helpMessage() {
-    print( "\nWecome to the Tic-Tac-Toe Game!" )
-    print("When your are asked, choose your character from either \"X\" or \"O\"")
-    print( "\nTo play the game chhose the number from the grid, where you want to place your chosen character" )
-    print( "You can type the following alphabets : " )
-    print( "    q - To quit the game." )
-    print( "    r - To restart the game." )
+    print( "\nWelcome to Isha's Tic-Tac-Toe Game!" )
+    print("When your are asked, choose your sign from either 'x' or 'o'")
+    print( "\nTo play the game, choose the number from the grid below, where you want to place your chosen sign." )
+    print( "You can enter 'q' to quit the game and 'r' to restart the game.\n")
 }
 
+
 enum PlayerMoves: String {
-    case anO = "O"
-    case aX = "X"
-    
+    case o = "o"
+    case x = "x"
+    case quit = "q"
+    case restart = "r"
     enum empty: String {
         case one = "1"
         case two = "2"
@@ -51,39 +57,45 @@ enum PlayerMoves: String {
     }
 }
 
-var validResponses: [String] = [PlayerMoves.empty.one.rawValue, PlayerMoves.empty.two.rawValue, PlayerMoves.empty.three.rawValue, PlayerMoves.empty.four.rawValue, PlayerMoves.empty.five.rawValue, PlayerMoves.empty.six.rawValue, PlayerMoves.empty.seven.rawValue, PlayerMoves.empty.eight.rawValue, PlayerMoves.empty.nine.rawValue, "q", "r" ]
+var validResponses: [String] = [PlayerMoves.empty.one.rawValue, PlayerMoves.empty.two.rawValue, PlayerMoves.empty.three.rawValue,
+                                PlayerMoves.empty.four.rawValue, PlayerMoves.empty.five.rawValue, PlayerMoves.empty.six.rawValue,
+                                PlayerMoves.empty.seven.rawValue, PlayerMoves.empty.eight.rawValue, PlayerMoves.empty.nine.rawValue,
+                                PlayerMoves.quit.rawValue, PlayerMoves.restart.rawValue ]
 
-let playerChoices = ["O", "X", "q", "r"]
+let playerChoices = [PlayerMoves.o.rawValue, PlayerMoves.x.rawValue, PlayerMoves.quit.rawValue, PlayerMoves.restart.rawValue]
 
 
 var gameBoard: [[String]] = [[PlayerMoves.empty.one.rawValue, PlayerMoves.empty.two.rawValue, PlayerMoves.empty.three.rawValue],
-        [PlayerMoves.empty.four.rawValue, PlayerMoves.empty.five.rawValue, PlayerMoves.empty.six.rawValue],
-        [PlayerMoves.empty.seven.rawValue, PlayerMoves.empty.eight.rawValue, PlayerMoves.empty.nine.rawValue]]
+                             [PlayerMoves.empty.four.rawValue, PlayerMoves.empty.five.rawValue, PlayerMoves.empty.six.rawValue],
+                             [PlayerMoves.empty.seven.rawValue, PlayerMoves.empty.eight.rawValue, PlayerMoves.empty.nine.rawValue]]
 
 
 func drawBoard() {
+    print("\n")
     print(" \(gameBoard[0][0]) | \(gameBoard[0][1]) | \(gameBoard[0][2]) ")
     print("___________")
     print(" \(gameBoard[1][0]) | \(gameBoard[1][1]) | \(gameBoard[1][2]) ")
     print("___________")
     print(" \(gameBoard[2][0]) | \(gameBoard[2][1]) | \(gameBoard[2][2]) ")
+    print("\n")
 }
+
 
 func refresh() {
     gameBoard = [[PlayerMoves.empty.one.rawValue, PlayerMoves.empty.two.rawValue, PlayerMoves.empty.three.rawValue],
-        [PlayerMoves.empty.four.rawValue, PlayerMoves.empty.five.rawValue, PlayerMoves.empty.six.rawValue],
-        [PlayerMoves.empty.seven.rawValue, PlayerMoves.empty.eight.rawValue, PlayerMoves.empty.nine.rawValue]]
+                 [PlayerMoves.empty.four.rawValue, PlayerMoves.empty.five.rawValue, PlayerMoves.empty.six.rawValue],
+                 [PlayerMoves.empty.seven.rawValue, PlayerMoves.empty.eight.rawValue, PlayerMoves.empty.nine.rawValue]]
     validInput = false
     player1Input = ""
     player2Input = ""
     player1Choice = ""
     player2Choice = ""
-    validResponses = [PlayerMoves.empty.one.rawValue, PlayerMoves.empty.two.rawValue, PlayerMoves.empty.three.rawValue, PlayerMoves.empty.four.rawValue, PlayerMoves.empty.five.rawValue, PlayerMoves.empty.six.rawValue, PlayerMoves.empty.seven.rawValue, PlayerMoves.empty.eight.rawValue, PlayerMoves.empty.nine.rawValue, "q", "r" ]
+    validResponses = [PlayerMoves.empty.one.rawValue, PlayerMoves.empty.two.rawValue, PlayerMoves.empty.three.rawValue, PlayerMoves.empty.four.rawValue, PlayerMoves.empty.five.rawValue, PlayerMoves.empty.six.rawValue, PlayerMoves.empty.seven.rawValue, PlayerMoves.empty.eight.rawValue, PlayerMoves.empty.nine.rawValue, PlayerMoves.quit.rawValue, PlayerMoves.restart.rawValue]
     currentIsPlayer1 = false
     currentIsPlayer2 = false
     player1PreviousMoves = 0
     player2PreviousMoves = 0
-    gameRefreshed = true
+    gameDraw = false
     print("Restarting the game")
 }
 
@@ -91,25 +103,31 @@ func refresh() {
 var isWin: Bool {
     return
         gameBoard[0][0] == gameBoard[0][1] && gameBoard[0][0] == gameBoard[0][2] || // row 0
-        gameBoard[1][0] == gameBoard[1][1] && gameBoard[1][0] == gameBoard[1][2] || // row 1
-        gameBoard[2][0] == gameBoard[2][1] && gameBoard[2][0] == gameBoard[2][2]  || // row 2
-        gameBoard[0][0] == gameBoard[1][0] && gameBoard[0][0] == gameBoard[2][0]  || // col 0
-        gameBoard[0][1] == gameBoard[1][1] && gameBoard[0][1] == gameBoard[2][1] || // col 1
-        gameBoard[0][2] == gameBoard[1][2] && gameBoard[0][2] == gameBoard[2][2] || // col 2
-        gameBoard[0][0] == gameBoard[1][1] && gameBoard[0][0] == gameBoard[2][2] || // diag 0
-        gameBoard[0][2] == gameBoard[1][1] && gameBoard[0][2] == gameBoard[2][0]  // diag 1
+            gameBoard[1][0] == gameBoard[1][1] && gameBoard[1][0] == gameBoard[1][2] || // row 1
+            gameBoard[2][0] == gameBoard[2][1] && gameBoard[2][0] == gameBoard[2][2]  || // row 2
+            gameBoard[0][0] == gameBoard[1][0] && gameBoard[0][0] == gameBoard[2][0]  || // col 0
+            gameBoard[0][1] == gameBoard[1][1] && gameBoard[0][1] == gameBoard[2][1] || // col 1
+            gameBoard[0][2] == gameBoard[1][2] && gameBoard[0][2] == gameBoard[2][2] || // col 2
+            gameBoard[0][0] == gameBoard[1][1] && gameBoard[0][0] == gameBoard[2][2] || // diag 0
+            gameBoard[0][2] == gameBoard[1][1] && gameBoard[0][2] == gameBoard[2][0]  // diag 1
 }
 
 
 var gameQuit: Bool {
     return
-        player1Choice == "q" || player2Choice == "q" || player2Input == "q" || player1Input == "q"
+        player1Choice == PlayerMoves.quit.rawValue || player2Choice == PlayerMoves.quit.rawValue || player2Input == PlayerMoves.quit.rawValue || player1Input == PlayerMoves.quit.rawValue
 }
+
+var gameRefreshed: Bool {
+    return
+        player1Choice == PlayerMoves.restart.rawValue || player2Choice == PlayerMoves.restart.rawValue || player2Input == PlayerMoves.restart.rawValue || player1Input == PlayerMoves.restart.rawValue || isWin || gameDraw
+}
+
 
 func getPlayerChoice() {
     var vaidCharacter = false
     while !vaidCharacter {
-        print("Player1: Please choose between X or O. Type your choice: ")
+        print("\nPlayer1: Please choose between x or o. Type your choice: ")
         let choice = readLine()
         
         if let z = choice {
@@ -117,25 +135,22 @@ func getPlayerChoice() {
                 vaidCharacter = true
                 player1Choice = z
                 
-                if player1Choice == "q" {
-                    print("Quitting Game")
+                //Checking if player has pressed "r" or "q" to quit/restart
+                if gameQuit {
+                    return
+                } else if gameRefreshed {
                     return
                 }
                 
-                if player1Choice == "r" {
-                    gameRefreshed = true
-                    return
+                //Setting choice of character
+                if player1Choice == PlayerMoves.o.rawValue {
+                    player2Choice = PlayerMoves.x.rawValue
+                } else if player1Choice == PlayerMoves.x.rawValue {
+                    player2Choice = PlayerMoves.o.rawValue
                 }
                 
-                if player1Choice == "O" {
-                    player2Choice = "X"
-                }
-            
-                if player1Choice == "X" {
-                    player2Choice = "O"
-                }
             } else {
-                print("Invalid response. Please choose between X or O")
+                print("\nInvalid response. Please choose between 'x' or 'o'")
             }
         }
     }
@@ -156,10 +171,10 @@ func checkValidityOfCharacters(response: String?) -> Bool {
 
 
 func checkInputVaidity(input: String?) {
-    if let x = input {
-        let characterInputValidity = checkValidityOfCharacters(response: x)
+    if let t = input {
+        let characterInputValidity = checkValidityOfCharacters(response: t)
         if !characterInputValidity {
-            print("Invalid Input. Choose from availabale digits.")
+            print("Invalid Input. Choose from available numbers.\n")
         } else if characterInputValidity {
             validInput = true
         }
@@ -172,32 +187,23 @@ func getInput() {
     player2Input = ""
     validInput = false
     
+    if gameRefreshed || gameQuit {
+        return
+    }
+    
     while !validInput {
+        //Getting input from Player1
         if currentIsPlayer1 {
-            print("Player1: Please type the number where you want to place your choice of \(player1Choice):")
+            print("Player1: Please enter the available number from the grid where you want to place your sign \(player1Choice):")
             player1Input = readLine()
             checkInputVaidity(input: player1Input)
-            if player1Input == "q" {
-                return
-            }
-            if player1Input == "r" {
-                gameRefreshed = true
-                return
-            }
         }
         
-    
+        //Getting input from Player2
         if currentIsPlayer2 {
-            print("Player2: Please type the number where you want to place your choice of \(player2Choice):")
+            print("Player2: Please enter the available number from the grid where you want to place your sign \(player2Choice):")
             player2Input = readLine()
             checkInputVaidity(input: player2Input)
-            if player2Input == "q" {
-                return
-            }
-            if player2Input == "r" {
-                gameRefreshed = true
-                return
-            }
         }
     }
 }
@@ -207,13 +213,14 @@ func player1Game() {
     currentIsPlayer1 = true
     currentIsPlayer2 = false
     getInput()
-    if gameQuit || gameRefreshed {
-        return
-    }
+   
     if validInput {
         if let z = player1Input {
-            let row = dict[z]?.row
-            let column = dict[z]?.column
+            if gameQuit || gameRefreshed {
+                return
+            }
+            let row = boardIndices[z]?.row
+            let column = boardIndices[z]?.column
             gameBoard[row!][column!] = player1Choice
             player1PreviousMoves += 1
             drawBoard()
@@ -226,13 +233,14 @@ func player2Game() {
     currentIsPlayer1 = false
     currentIsPlayer2 = true
     getInput()
-    if gameQuit || gameRefreshed {
-        return
-    }
+    
     if validInput {
         if let z = player2Input {
-            let row = dict[z]?.row
-            let column = dict[z]?.column
+            if gameQuit || gameRefreshed {
+                return
+            }
+            let row = boardIndices[z]?.row
+            let column = boardIndices[z]?.column
             gameBoard[row!][column!] = player2Choice
             player2PreviousMoves += 1
             drawBoard()
@@ -243,12 +251,16 @@ func player2Game() {
 
 func checkWin() {
     if isWin {
+        gameDraw = false
         print("Game Over")
         if currentIsPlayer1 {
+            print("\n-----------------------------------")
             print("Player1 is the winner")
-        }
-        if currentIsPlayer2 {
+            print("-----------------------------------\n")
+        } else if currentIsPlayer2 {
+            print("\n-----------------------------------")
             print("Player2 is the winner")
+            print("-----------------------------------\n")
         }
     }
 }
@@ -256,74 +268,86 @@ func checkWin() {
 
 func startGame() {
     while (player1PreviousMoves < 3 || player1PreviousMoves == 3) && (player1PreviousMoves < 5 || player1PreviousMoves == 5) && (player2PreviousMoves < 4 || player2PreviousMoves == 4) {
+        
         player1Game()
-        
-        if player1Input == "q" {
+        if gameQuit {
             print("Quitting the game")
             return
-        }
-        
-        if player1Input == "r" {
-            gameRefreshed = true
-            return
+        } else if gameRefreshed {
+           return
         }
         
         checkWin()
         if isWin {
-            gameRefreshed = true
             return
         }
+        
         player2Game()
-        
-        if  player2Input == "q" {
+        if  gameQuit {
             print("Quitting the game")
             return
-        }
-        
-        if player2Input == "r" {
-            gameRefreshed = true
+        } else if gameRefreshed {
             return
         }
         
         checkWin()
         if isWin {
-            gameRefreshed = true
             return
         }
     }
     
     if !isWin {
+        print("\n-----------------------------------")
         print("No Winner. Game Over")
-        gameRefreshed = true
+        print("-----------------------------------\n")
+        gameDraw = true
+        print("comes here")
+        return
     }
 }
 
-func playTheGame() {
-    helpMessage()
-    drawBoard()
-    getPlayerChoice()
-    if !gameQuit && !gameRefreshed {
-        startGame()
-    }
-}
 
 func restartGame() {
     while gameRefreshed {
-        if gameRefreshed && !gameQuit {
-            refresh()
-            helpMessage()
-            drawBoard()
-            getPlayerChoice()
         
-            if !gameQuit && gameRefreshed {
-                gameRefreshed = false
-                startGame()
-            } else {
+        refresh()
+        drawBoard()
+        getPlayerChoice()
+            
+        if gameQuit {
+            print("Quitting the game")
+            return
+        } else if gameRefreshed && !gameQuit {
+            refresh()
+            getPlayerChoice()
+            startGame()
+            if gameQuit {
+                return
+            }
+        } else if !gameRefreshed && !gameQuit {
+            startGame()
+            if gameQuit {
                 return
             }
         }
     }
 }
 
+
+
+func playTheGame() {
+    helpMessage()
+    drawBoard()
+    getPlayerChoice()
+    if !gameQuit {
+        startGame()
+    }
+    restartGame()
+}
+
+
+
+
 playTheGame()
-restartGame()
+
+
