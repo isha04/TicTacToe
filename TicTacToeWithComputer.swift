@@ -182,6 +182,10 @@ func computerPlays() {
             return
         } else if winOrBlockWin(inputCharacter: humanPlayerCharacter) {
             return
+        } else if implementFork() {
+            return
+        } else if createFork() {
+            return
         }
         
         //Center
@@ -230,6 +234,7 @@ func computerPlays() {
 
 
 func winOrBlockWin(inputCharacter: String) -> Bool {
+    //Top Row cases
     if (gameBoard[0][0] == inputCharacter) && (gameBoard[0][1] == inputCharacter) && (gameBoard[0][2] == PlayerMoves.empty.three.rawValue) {
         computerInputPlace = gameBoard[0][2]
         gameBoard[0][2] = computerPlayerCharacter
@@ -307,6 +312,78 @@ func winOrBlockWin(inputCharacter: String) -> Bool {
         computerInputPlace = gameBoard[0][2]
         gameBoard[0][2] = computerPlayerCharacter
         return true
+        //diagnal cases
+    } else if gameBoard[2][0] == inputCharacter && gameBoard[1][1] == inputCharacter &&  gameBoard[0][2] == PlayerMoves.empty.three.rawValue {
+        computerInputPlace = gameBoard[0][2]
+        gameBoard[0][2] = computerPlayerCharacter
+        return true
+    } else if gameBoard[2][0] == PlayerMoves.empty.seven.rawValue && gameBoard[1][1] == inputCharacter && gameBoard[0][2] == inputCharacter {
+        computerInputPlace = gameBoard[2][0]
+        gameBoard[2][0] = computerPlayerCharacter
+        return true
+    } else if gameBoard[0][0] == inputCharacter && gameBoard[1][1] == inputCharacter && gameBoard[2][2] == PlayerMoves.empty.nine.rawValue {
+        computerInputPlace = gameBoard[2][2]
+        gameBoard[2][2] = computerPlayerCharacter
+        return true
+    } else if gameBoard[0][0] == PlayerMoves.empty.one.rawValue && gameBoard[1][1] == inputCharacter && gameBoard[2][2] == inputCharacter {
+        computerInputPlace = gameBoard[0][0]
+        gameBoard[0][0] = computerInputPlace
+        return true
+    }
+    return false
+}
+
+func implementFork() -> Bool {
+    if (gameBoard[0][0] == humanPlayerCharacter && gameBoard[2][2] == humanPlayerCharacter && gameBoard[1][1] == computerPlayerCharacter)  {
+        if blockFork() {
+            return true
+        }
+    }
+    
+    if gameBoard[0][2] == humanPlayerCharacter && gameBoard[1][1] == computerPlayerCharacter && gameBoard[2][0] == humanPlayerCharacter {
+        if blockFork() {
+            return true
+        }
+    }
+    
+    return false
+}
+
+func blockFork() -> Bool {
+    if validResponses.contains(where: { $0 == "4" }) || validResponses.contains(where: { $0 == "6" }) || validResponses.contains(where: { $0 == "2" }) || validResponses.contains(where: { $0 == "8" }) {
+        guard let randomPosition = validResponses.randomItem() else {return false}
+        computerInputPlace = randomPosition
+        guard let comp = boardIndices[randomPosition] else {return false}
+        gameBoard[comp.row][comp.column] = computerPlayerCharacter
+        return true
+    }
+    return false
+}
+
+
+func createFork() -> Bool {
+    if gameBoard[0][0] == computerPlayerCharacter && gameBoard[1][1] == humanPlayerCharacter && (gameBoard[2][2] != humanPlayerCharacter && gameBoard[2][2] != computerPlayerCharacter) {
+        computerInputPlace = gameBoard[2][2]
+        gameBoard[2][2] = computerPlayerCharacter
+        return true
+    }
+    
+    if gameBoard[2][2] == computerPlayerCharacter && gameBoard[1][1] == humanPlayerCharacter && (gameBoard[0][0] != humanPlayerCharacter && gameBoard[0][0] != computerPlayerCharacter) {
+        computerInputPlace = gameBoard[0][0]
+        gameBoard[0][0] = computerPlayerCharacter
+        return true
+    }
+    
+    if gameBoard[0][2] == computerPlayerCharacter && gameBoard[1][1] == humanPlayerCharacter && (gameBoard[2][0] != humanPlayerCharacter && gameBoard[2][0] != computerPlayerCharacter) {
+        computerInputPlace = gameBoard[2][0]
+        gameBoard[2][0] = computerPlayerCharacter
+        return true
+    }
+    
+    if gameBoard[2][0] == computerPlayerCharacter && gameBoard[1][1] == humanPlayerCharacter && (gameBoard[0][2] != humanPlayerCharacter && gameBoard[0][2] != computerPlayerCharacter) {
+        computerInputPlace = gameBoard[0][2]
+        gameBoard[0][2] = computerPlayerCharacter
+        return true
     }
     return false
 }
@@ -315,10 +392,7 @@ func winOrBlockWin(inputCharacter: String) -> Bool {
 func forComputerExecution() {
     print("Computer's turn")
     if let index = validResponses.index(of: computerInputPlace) {
-        print(validResponses)
         validResponses.remove(at: index)
-        print("this is input \(computerInputPlace)")
-        print("ths is index \(index)")
     }
     drawBoard()
     currentPlayerIsComputer = false
@@ -428,6 +502,13 @@ func restartGame() {
     }
 }
 
+extension Array {
+    func randomItem() -> Element? {
+        if isEmpty { return nil }
+        let index = Int(arc4random_uniform(UInt32(self.count)))
+        return self[index]
+    }
+}
 
 func playTheGame() {
     welcomeMessage()
