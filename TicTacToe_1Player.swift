@@ -4,21 +4,12 @@ import Foundation
 
 var currentPlayerIsHuman = false
 var currentPlayerIsComputer = false
-var player1 = ""
-var player2 = ""
 var humanPlayerCharacter = ""
 var computerPlayerCharacter = ""
 var humanPlayerChoice = ""
 var gameRefreshed = false
-var Player1PreviousMoves = 0
-var Player2PreviousMoves = 0
 var validInput = false
 
-
-enum Players: String {
-    case human = "human"
-    case computer = "computer"
-}
 
 enum PlayerMoves: String {
     case o = "o"
@@ -39,6 +30,7 @@ enum PlayerMoves: String {
         case nine = "9"
     }
 }
+
 
 let boardIndices = ["1": (row: 0, column: 0),
                     "2": (row: 0, column: 1),
@@ -101,8 +93,7 @@ func welcomeMessage() {
 
 func playerToGoFirst() {
     var yesNoValidity = false
-    currentPlayerIsHuman = false
-    currentPlayerIsComputer = false
+    
     print("Do you want to take the first turn? Type \"y\" if you want to go first. Type \"n\" if you want the computer to go first")
     while !yesNoValidity {
         let yesOrNoInput = readLine()
@@ -110,26 +101,24 @@ func playerToGoFirst() {
             switch z {
             case PlayerMoves.yes.rawValue:
                 yesNoValidity = true
-                currentPlayerIsHuman = true
                 humanPlayerCharacter = PlayerMoves.o.rawValue
-                currentPlayerIsComputer = false
                 computerPlayerCharacter = PlayerMoves.x.rawValue
                 humanPlayerChoice = z
                 if humanPlayerChoice == PlayerMoves.restart.rawValue {
                     gameRefreshed = true
                     return
                 }
-                player1 = Players.human.rawValue
-                player2 = Players.computer.rawValue
+                currentPlayerIsHuman = true
+                currentPlayerIsComputer = false
+                
             case PlayerMoves.no.rawValue:
                 yesNoValidity = true
-                currentPlayerIsHuman = false
                 humanPlayerCharacter = PlayerMoves.x.rawValue
-                currentPlayerIsComputer = true
                 computerPlayerCharacter = PlayerMoves.o.rawValue
                 humanPlayerChoice = z
-                player1 = Players.computer.rawValue
-                player2 = Players.human.rawValue
+                currentPlayerIsComputer = true
+                currentPlayerIsHuman = false
+                
             case PlayerMoves.quit.rawValue:
                 humanPlayerChoice = z
                 return
@@ -203,11 +192,6 @@ func computerPlays() {
             drawBoard()
             currentPlayerIsComputer = false
             currentPlayerIsHuman = true
-            if player1 == Players.computer.rawValue {
-                Player1PreviousMoves += 1
-            } else if player2 == Players.computer.rawValue {
-                Player2PreviousMoves += 1
-            }
         }
     }
 }
@@ -232,44 +216,33 @@ func humanPlays() {
             drawBoard()
             currentPlayerIsComputer = true
             currentPlayerIsHuman = false
-            if player1 == Players.human.rawValue {
-                Player1PreviousMoves += 1
-            } else if player2 == Players.human.rawValue {
-                Player2PreviousMoves += 1
-            }
         }
     }
 }
 
-func printWinMessages() {
-    print("Game Over")
-    if player1 == Players.human.rawValue {
-        print("\n-----------------------------------")
-        print("You win")
-        print("-----------------------------------\n")
-    } else if player2 == Players.human.rawValue {
-        print("\n-----------------------------------")
-        print("You lose")
-        print("-----------------------------------\n")
-    }
-}
 
 func startGame() {
-    while (Player1PreviousMoves < 3 || Player1PreviousMoves == 3) && (Player1PreviousMoves < 5 || Player1PreviousMoves == 5) && (Player2PreviousMoves < 4 || Player2PreviousMoves == 4) {
-        
+    while validResponses.count > 0 {
         humanPlays()
         if gameQuit || gameRefreshed {
             return
         }
         if isWin {
             gameRefreshed = true
-            printWinMessages()
+            print("Game Over")
+            print("\n-----------------------------------")
+            print("You win")
+            print("-----------------------------------\n")
             return
         }
         computerPlays()
+        
         if isWin {
             gameRefreshed = true
-            printWinMessages()
+            print("Game Over")
+            print("\n-----------------------------------")
+            print("You lose")
+            print("-----------------------------------\n")
             return
         }
     }
@@ -291,14 +264,10 @@ func refresh() {
     validResponses = [PlayerMoves.empty.one.rawValue, PlayerMoves.empty.two.rawValue, PlayerMoves.empty.three.rawValue, PlayerMoves.empty.four.rawValue, PlayerMoves.empty.five.rawValue, PlayerMoves.empty.six.rawValue, PlayerMoves.empty.seven.rawValue, PlayerMoves.empty.eight.rawValue, PlayerMoves.empty.nine.rawValue]
     currentPlayerIsHuman = false
     currentPlayerIsComputer = false
-    player1 = ""
-    player2 = ""
     humanPlayerCharacter = ""
     computerPlayerCharacter = ""
     humanPlayerChoice = ""
     gameRefreshed = false
-    Player1PreviousMoves = 0
-    Player2PreviousMoves = 0
     validInput = false
     print("Restarting the game")
 }
@@ -349,3 +318,4 @@ func playTheGame() {
 }
 
 playTheGame()
+
