@@ -23,17 +23,6 @@ var player2Choice = ""
 var gameRefreshed = false
 
 
-var boardIndices = ["1": (row: 0, column: 0),
-                    "2": (row: 0, column: 1),
-                    "3": (row: 0, column: 2),
-                    "4": (row: 1, column: 0),
-                    "5": (row: 1, column: 1),
-                    "6": (row: 1, column: 2),
-                    "7": (row: 2, column: 0),
-                    "8": (row: 2, column: 1),
-                    "9": (row: 2, column: 2)]
-
-
 func helpMessage() {
     print( "\nWelcome to Isha's Tic-Tac-Toe Game!" )
     print("When your are asked, choose your sign from either 'x' or 'o'")
@@ -48,6 +37,7 @@ enum PlayerMoves: String {
     case quit = "q"
     case restart = "r"
     enum empty: String {
+        case zero = "0"
         case one = "1"
         case two = "2"
         case three = "3"
@@ -56,14 +46,13 @@ enum PlayerMoves: String {
         case six = "6"
         case seven = "7"
         case eight = "8"
-        case nine = "9"
     }
 }
 
-//valid responses for the game's grid - Player can type a number between 1 - 9 or r (to restart) or q (to quit)
-var validResponses: [String] = [PlayerMoves.empty.one.rawValue, PlayerMoves.empty.two.rawValue, PlayerMoves.empty.three.rawValue,
+//valid responses for the game's grid - Player can type a number between 0 - 8 or r (to restart) or q (to quit)
+var validResponses: [String] = [PlayerMoves.empty.zero.rawValue, PlayerMoves.empty.one.rawValue, PlayerMoves.empty.two.rawValue,        PlayerMoves.empty.three.rawValue,
                                 PlayerMoves.empty.four.rawValue, PlayerMoves.empty.five.rawValue, PlayerMoves.empty.six.rawValue,
-                                PlayerMoves.empty.seven.rawValue, PlayerMoves.empty.eight.rawValue, PlayerMoves.empty.nine.rawValue,
+                                PlayerMoves.empty.seven.rawValue, PlayerMoves.empty.eight.rawValue,
                                 PlayerMoves.quit.rawValue, PlayerMoves.restart.rawValue ]
 
 //Applicable when the player is asked to choose between "x" or o"
@@ -73,32 +62,32 @@ let playerChoices = [PlayerMoves.o.rawValue,
                      PlayerMoves.restart.rawValue]
 
 
-var gameBoard: [[String]] = [[PlayerMoves.empty.one.rawValue, PlayerMoves.empty.two.rawValue, PlayerMoves.empty.three.rawValue],
-                             [PlayerMoves.empty.four.rawValue, PlayerMoves.empty.five.rawValue, PlayerMoves.empty.six.rawValue],
-                             [PlayerMoves.empty.seven.rawValue, PlayerMoves.empty.eight.rawValue, PlayerMoves.empty.nine.rawValue]]
+var gameBoard: [String] = [PlayerMoves.empty.zero.rawValue, PlayerMoves.empty.one.rawValue, PlayerMoves.empty.two.rawValue, PlayerMoves.empty.three.rawValue,
+                             PlayerMoves.empty.four.rawValue, PlayerMoves.empty.five.rawValue, PlayerMoves.empty.six.rawValue,
+                             PlayerMoves.empty.seven.rawValue, PlayerMoves.empty.eight.rawValue]
 
 
 func drawBoard() {
     print("\n")
-    print(" \(gameBoard[0][0]) | \(gameBoard[0][1]) | \(gameBoard[0][2]) ")
+    print(" \(gameBoard[0]) | \(gameBoard[1]) | \(gameBoard[2]) ")
     print("___________")
-    print(" \(gameBoard[1][0]) | \(gameBoard[1][1]) | \(gameBoard[1][2]) ")
+    print(" \(gameBoard[3]) | \(gameBoard[4]) | \(gameBoard[5]) ")
     print("___________")
-    print(" \(gameBoard[2][0]) | \(gameBoard[2][1]) | \(gameBoard[2][2]) ")
+    print(" \(gameBoard[6]) | \(gameBoard[7]) | \(gameBoard[8]) ")
     print("\n")
 }
 
 //Conditions for winning the game
 var isWin: Bool {
     return
-        gameBoard[0][0] == gameBoard[0][1] && gameBoard[0][0] == gameBoard[0][2] || // row 0
-            gameBoard[1][0] == gameBoard[1][1] && gameBoard[1][0] == gameBoard[1][2] || // row 1
-            gameBoard[2][0] == gameBoard[2][1] && gameBoard[2][0] == gameBoard[2][2]  || // row 2
-            gameBoard[0][0] == gameBoard[1][0] && gameBoard[0][0] == gameBoard[2][0]  || // col 0
-            gameBoard[0][1] == gameBoard[1][1] && gameBoard[0][1] == gameBoard[2][1] || // col 1
-            gameBoard[0][2] == gameBoard[1][2] && gameBoard[0][2] == gameBoard[2][2] || // col 2
-            gameBoard[0][0] == gameBoard[1][1] && gameBoard[0][0] == gameBoard[2][2] || // diag 0
-            gameBoard[0][2] == gameBoard[1][1] && gameBoard[0][2] == gameBoard[2][0]  // diag 1
+        gameBoard[0] == gameBoard[1] && gameBoard[0] == gameBoard[2] || // row 0
+        gameBoard[3] == gameBoard[4] && gameBoard[3] == gameBoard[5] || // row 1
+        gameBoard[6] == gameBoard[7] && gameBoard[6] == gameBoard[8]  || // row 2
+        gameBoard[0] == gameBoard[3] && gameBoard[0] == gameBoard[6]  || // col 0
+        gameBoard[1] == gameBoard[4] && gameBoard[1] == gameBoard[7] || // col 1
+        gameBoard[2] == gameBoard[5] && gameBoard[2] == gameBoard[8] || // col 2
+        gameBoard[0] == gameBoard[1] && gameBoard[0] == gameBoard[8] || // diag 0
+        gameBoard[2] == gameBoard[1] && gameBoard[2] == gameBoard[6]  // diag 1
 }
 
 
@@ -212,9 +201,7 @@ func player1Game() {
             if gameQuit || gameRefreshed {
                 return
             }
-            let row = boardIndices[z]?.row
-            let column = boardIndices[z]?.column
-            gameBoard[row!][column!] = player1Choice
+            gameBoard[Int(z)!] = player1Choice
             player1PreviousMoves += 1
             drawBoard()
         }
@@ -235,9 +222,7 @@ func player2Game() {
             if gameQuit || gameRefreshed {
                 return
             }
-            let row = boardIndices[z]?.row
-            let column = boardIndices[z]?.column
-            gameBoard[row!][column!] = player2Choice
+            gameBoard[Int(z)!] = player2Choice
             player2PreviousMoves += 1
             drawBoard()
         }
@@ -304,15 +289,18 @@ func startGame() {
 
 //Restoring all variables to default value to restart the game
 func refresh() {
-    gameBoard = [[PlayerMoves.empty.one.rawValue, PlayerMoves.empty.two.rawValue, PlayerMoves.empty.three.rawValue],
-                 [PlayerMoves.empty.four.rawValue, PlayerMoves.empty.five.rawValue, PlayerMoves.empty.six.rawValue],
-                 [PlayerMoves.empty.seven.rawValue, PlayerMoves.empty.eight.rawValue, PlayerMoves.empty.nine.rawValue]]
+    gameBoard = [PlayerMoves.empty.zero.rawValue, PlayerMoves.empty.one.rawValue, PlayerMoves.empty.two.rawValue, PlayerMoves.empty.three.rawValue,
+                 PlayerMoves.empty.four.rawValue, PlayerMoves.empty.five.rawValue, PlayerMoves.empty.six.rawValue,
+                 PlayerMoves.empty.seven.rawValue, PlayerMoves.empty.eight.rawValue]
     validInput = false
     player1Input = ""
     player2Input = ""
     player1Choice = ""
     player2Choice = ""
-    validResponses = [PlayerMoves.empty.one.rawValue, PlayerMoves.empty.two.rawValue, PlayerMoves.empty.three.rawValue, PlayerMoves.empty.four.rawValue, PlayerMoves.empty.five.rawValue, PlayerMoves.empty.six.rawValue, PlayerMoves.empty.seven.rawValue, PlayerMoves.empty.eight.rawValue, PlayerMoves.empty.nine.rawValue, PlayerMoves.quit.rawValue, PlayerMoves.restart.rawValue]
+    validResponses = [PlayerMoves.empty.zero.rawValue, PlayerMoves.empty.one.rawValue, PlayerMoves.empty.two.rawValue,        PlayerMoves.empty.three.rawValue,
+                      PlayerMoves.empty.four.rawValue, PlayerMoves.empty.five.rawValue, PlayerMoves.empty.six.rawValue,
+                      PlayerMoves.empty.seven.rawValue, PlayerMoves.empty.eight.rawValue,
+                      PlayerMoves.quit.rawValue, PlayerMoves.restart.rawValue ]
     currentIsPlayer1 = false
     currentIsPlayer2 = false
     player1PreviousMoves = 0
