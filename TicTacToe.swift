@@ -52,8 +52,7 @@ enum PlayerMoves: String {
 //valid responses for the game's grid - Player can type a number between 0 - 8 or r (to restart) or q (to quit)
 var validResponses: [String] = [PlayerMoves.empty.zero.rawValue, PlayerMoves.empty.one.rawValue, PlayerMoves.empty.two.rawValue,        PlayerMoves.empty.three.rawValue,
                                 PlayerMoves.empty.four.rawValue, PlayerMoves.empty.five.rawValue, PlayerMoves.empty.six.rawValue,
-                                PlayerMoves.empty.seven.rawValue, PlayerMoves.empty.eight.rawValue,
-                                PlayerMoves.quit.rawValue, PlayerMoves.restart.rawValue ]
+                                PlayerMoves.empty.seven.rawValue, PlayerMoves.empty.eight.rawValue]
 
 //Applicable when the player is asked to choose between "x" or o"
 let playerChoices = [PlayerMoves.o.rawValue,
@@ -136,11 +135,16 @@ func getPlayerChoice() {
 
 func checkValidityOfCharacters(response: String?) -> Bool {
     if let y = response {
-        if  validResponses.contains(y) && y.count == 1 {
+        if  validResponses.contains(y) {
             if let index = validResponses.index(of: y) {
                 validResponses.remove(at: index)
                 return true
             }
+        } else if y == PlayerMoves.restart.rawValue || y == PlayerMoves.quit.rawValue {
+            if y == PlayerMoves.restart.rawValue {
+                gameRefreshed = true
+            }
+            return true
         }
     }
     return false
@@ -246,7 +250,7 @@ func printWinMessages() {
 //Game maker function
 
 func startGame() {
-    while (player1PreviousMoves < 3 || player1PreviousMoves == 3) && (player1PreviousMoves < 5 || player1PreviousMoves == 5) && (player2PreviousMoves < 4 || player2PreviousMoves == 4) {
+    while validResponses.count > 0 {
         
         player1Game()
         if gameQuit {
